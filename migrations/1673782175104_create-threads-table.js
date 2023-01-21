@@ -22,8 +22,8 @@ exports.up = (pgm) => {
       notNull: true,
     },
     date: {
-      type: 'DATE',
-      default: '"NOW()"',
+      type: 'TIMESTAMPTZ',
+      default: pgm.func('now()'),
     },
   });
 };

@@ -118,7 +118,7 @@ describe('ThreadRepositoryPostgres', () => {
 
       await UsersTableTestHelper.addUser({ id: threadPayload.owner });
       await ThreadsTableTestHelper.addThread({
-        id: threadPayload.id, owner: threadPayload.owner,
+        id: threadPayload.id, owner: threadPayload.owner, date: expectedComment.date,
       });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
@@ -152,10 +152,10 @@ describe('ThreadRepositoryPostgres', () => {
 
       await UsersTableTestHelper.addUser({ id: threadPayload.owner });
       await ThreadsTableTestHelper.addThread({
-        id: threadPayload.id, owner: threadPayload.owner,
+        id: threadPayload.id, owner: threadPayload.owner, date: expectedThread.date,
       });
       await CommentsTableTestHelper.addComment({
-        threadId: threadPayload.id, owner: threadPayload.owner,
+        threadId: threadPayload.id, owner: threadPayload.owner, date: expectedThread.date,
       });
 
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
