@@ -2,19 +2,26 @@ class NewComment {
   constructor(payload) {
     this._verifyPayload(payload);
 
-    const { threadId, content, owner } = payload;
+    const {
+      threadId, content, owner, commentId,
+    } = payload;
 
     this.threadId = threadId;
     this.content = content;
     this.owner = owner;
+    if (commentId) {
+      this.commentId = commentId;
+    }
   }
 
-  _verifyPayload({ threadId, content, owner }) {
+  _verifyPayload({
+    threadId, content, owner, commentId,
+  }) {
     if (!threadId || !content || !owner) {
       throw new Error('NEW_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
     }
 
-    if (typeof threadId !== 'string' || typeof content !== 'string' || typeof owner !== 'string') {
+    if (typeof threadId !== 'string' || typeof content !== 'string' || typeof owner !== 'string' || (commentId && typeof commentId !== 'string')) {
       throw new Error('NEW_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
     }
   }

@@ -39,4 +39,25 @@ describe('a NewComment entities', () => {
     expect(threadId).toEqual(payload.threadId);
     expect(owner).toEqual(payload.owner);
   });
+
+  it('should create a newComment object correctly but have commentId', () => {
+    // Arrange
+    const payload = {
+      threadId: 'thread-123',
+      content: 'abc',
+      owner: 'user-123',
+      commentId: 'comment-321',
+    };
+
+    // Action
+    const {
+      threadId, content, owner, commentId,
+    } = new NewComment(payload);
+
+    // Assert
+    expect(content).toEqual(payload.content);
+    expect(threadId).toEqual(payload.threadId);
+    expect(owner).toEqual(payload.owner);
+    expect(commentId).toEqual(payload.commentId);
+  });
 });

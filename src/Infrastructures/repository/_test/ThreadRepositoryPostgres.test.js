@@ -167,5 +167,116 @@ describe('ThreadRepositoryPostgres', () => {
       expect(addedThread).toStrictEqual(expectedThread);
       expect(addedThread.comments).toStrictEqual(expectedThread.comments);
     });
+
+    it('should return addedThread object correctly when thread is found and has comments and replies', async () => {
+      // Arrange
+      const threadPayload = {
+        id: 'thread-123',
+        owner: 'user-123',
+      };
+      const expectedThread = new Thread({
+        id: 'thread-123',
+        title: 'test',
+        body: 'test thread',
+        date: new Date('2023-01-17T17:00:00.000Z'),
+        username: 'test',
+        comments: [new Comment({
+          id: 'comment-123',
+          content: 'test comment',
+          date: new Date('2023-01-17T17:00:00.000Z'),
+          username: 'test',
+          replies: [new Comment({
+            id: 'comment-321',
+            content: 'test comment',
+            date: new Date('2023-01-17T17:00:00.000Z'),
+            username: 'test',
+          })],
+        })],
+      });
+
+      await UsersTableTestHelper.addUser({ id: threadPayload.owner });
+      await ThreadsTableTestHelper.addThread({
+        id: threadPayload.id, owner: threadPayload.owner, date: expectedThread.date,
+      });
+      await CommentsTableTestHelper.addComment({
+        threadId: threadPayload.id, owner: threadPayload.owner, date: expectedThread.date,
+      });
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-321', threadId: threadPayload.id, owner: threadPayload.owner, commentId: 'comment-123', date: expectedThread.date,
+      });
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      // Action
+      const addedThread = await threadRepositoryPostgres.getThreadById(threadPayload.id);
+
+      // Assert
+      expect(addedThread).toStrictEqual(expectedThread);
+      expect(addedThread.comments).toStrictEqual(expectedThread.comments);
+      expect(addedThread.comments[0].replies).toStrictEqual(expectedThread.comments[0].replies);
+    });
+
+    it('should return addedThread object correctly when thread is found and has comments and replies', async () => {
+      // Arrange
+      const threadPayload = {
+        id: 'thread-123',
+        owner: 'user-123',
+      };
+      const expectedThread = new Thread({
+        id: 'thread-123',
+        title: 'test',
+        body: 'test thread',
+        date: new Date('2023-01-17T17:00:00.000Z'),
+        username: 'test',
+        comments: [
+          new Comment({
+            id: 'comment-123',
+            content: 'test comment',
+            date: new Date('2023-01-17T17:00:00.000Z'),
+            username: 'test',
+            replies: [
+              new Comment({
+                id: 'comment-321',
+                content: 'test comment',
+                date: new Date('2023-01-17T17:00:00.000Z'),
+                username: 'test',
+              }),
+            ],
+          }),
+          new Comment({
+            id: 'comment-111',
+            content: 'test comment',
+            date: new Date('2023-01-17T18:00:00.000Z'),
+            username: 'test',
+            replies: [],
+          }),
+        ],
+      });
+
+      await UsersTableTestHelper.addUser({ id: threadPayload.owner });
+      await ThreadsTableTestHelper.addThread({
+        id: threadPayload.id, owner: threadPayload.owner, date: expectedThread.date,
+      });
+      await CommentsTableTestHelper.addComment({
+        threadId: threadPayload.id, owner: threadPayload.owner, date: expectedThread.date,
+      });
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-111', threadId: threadPayload.id, owner: threadPayload.owner, date: new Date('2023-01-17T18:00:00.000Z'),
+      });
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-321', threadId: threadPayload.id, owner: threadPayload.owner, commentId: 'comment-123', date: expectedThread.date,
+      });
+
+      const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
+
+      // Action
+      const addedThread = await threadRepositoryPostgres.getThreadById(threadPayload.id);
+
+      // Assert
+      expect(addedThread.comments).toHaveLength(2);
+      expect(addedThread.comments[0]).toStrictEqual(expectedThread.comments[0]);
+      expect(addedThread.comments[0].replies).toStrictEqual(expectedThread.comments[0].replies);
+      expect(addedThread.comments[1].replies).toHaveLength(0);
+    });
   });
 });

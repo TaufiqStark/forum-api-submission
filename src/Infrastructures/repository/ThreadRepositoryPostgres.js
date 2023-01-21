@@ -39,7 +39,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
   async getThreadById(id) {
     const query = {
-      text: `SELECT t.date::timestamptz, t.*, u.username FROM threads t
+      text: `SELECT t.*, u.username FROM threads t
       LEFT JOIN users u ON u.id = t.owner WHERE t.id = $1`,
       values: [id],
     };
@@ -51,16 +51,28 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     }
 
     const commentQuery = {
-      text: `SELECT c.date::timestamptz, c.*, u.username FROM comments c
-      LEFT JOIN users u ON u.id = c.owner WHERE c."threadId" = $1 ORDER BY date`,
+      text: `SELECT c.*, u.username FROM comments c
+      LEFT JOIN users u ON u.id = c.owner WHERE c."threadId" = $1 AND c."commentId" IS NULL ORDER BY date`,
       values: [result.rows[0]?.id],
     };
     const comments = await this._pool.query(commentQuery);
 
+    const replyQuery = {
+      text: `SELECT c.*, u.username FROM comments c
+      LEFT JOIN users u ON u.id = c.owner WHERE c."threadId" = $1 AND c."commentId" = ANY($2::text[]) ORDER BY date`,
+      values: [result.rows[0]?.id, comments.rows.map((c) => c.id)],
+    };
+    const replies = await this._pool.query(replyQuery);
+
     return new Thread({
       ...result.rows[0],
       comments: comments.rows
-        .map((c) => new Comment({ ...c, replies: [] })),
+        .map((c) => new Comment({
+          ...c,
+          replies: replies.rows
+            .map((r) => (c.id === r.commentId ? new Comment(r) : 0))
+            .filter((r) => r),
+        })),
     });
   }
 }

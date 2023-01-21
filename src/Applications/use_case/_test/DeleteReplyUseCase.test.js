@@ -1,30 +1,30 @@
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
-const DeleteCommentUseCase = require('../DeleteCommentUseCase');
+const DeleteReplyUseCase = require('../DeleteReplyUseCase');
 
-describe('DeleteCommentUseCase', () => {
+describe('DeleteReplyUseCase', () => {
   it('should throw error if use case payload not contain id', async () => {
     // Arrange
     const commentId = null;
-    const deleteCommentUseCase = new DeleteCommentUseCase({});
+    const deleteReplyUseCase = new DeleteReplyUseCase({});
 
     // Action & Assert
-    await expect(deleteCommentUseCase.execute(commentId, 'user-123'))
+    await expect(deleteReplyUseCase.execute(commentId, 'user-123'))
       .rejects
-      .toThrowError('DELETE_COMMENT_USE_CASE.NOT_CONTAIN_ID');
+      .toThrowError('DELETE_REPLY_USE_CASE.NOT_CONTAIN_ID');
   });
 
-  it('should throw error if comment id not string', async () => {
+  it('should throw error if reply id not string', async () => {
     // Arrange
     const commentId = 123;
-    const deleteCommentUseCase = new DeleteCommentUseCase({});
+    const deleteReplyUseCase = new DeleteReplyUseCase({});
 
     // Action & Assert
-    await expect(deleteCommentUseCase.execute(commentId, 'user-123'))
+    await expect(deleteReplyUseCase.execute(commentId, 'user-123'))
       .rejects
-      .toThrowError('DELETE_COMMENT_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
+      .toThrowError('DELETE_REPLY_USE_CASE.PAYLOAD_NOT_MEET_DATA_TYPE_SPECIFICATION');
   });
 
-  it('should orchestrating the delete comment action correctly', async () => {
+  it('should orchestrating the delete reply action correctly', async () => {
     // Arrange
     const commentId = 'comment-123';
 
@@ -36,17 +36,17 @@ describe('DeleteCommentUseCase', () => {
     mockCommentRepository.deleteComment = jest.fn()
       .mockImplementation(() => Promise.resolve());
 
-    const deleteCommentUseCase = new DeleteCommentUseCase({
+    const deleteReplyUseCase = new DeleteReplyUseCase({
       commentRepository: mockCommentRepository,
     });
 
     // Action
-    await deleteCommentUseCase.execute(commentId, 'user-123');
+    await deleteReplyUseCase.execute(commentId, 'user-123');
 
     // Assert
     expect(mockCommentRepository.verifyAvailabilityComment)
       .toHaveBeenCalledWith(commentId);
     expect(mockCommentRepository.deleteComment)
-      .toHaveBeenCalledWith(commentId);
+      .toHaveBeenCalledWith(commentId, '**balasan telah dihapus**');
   });
 });

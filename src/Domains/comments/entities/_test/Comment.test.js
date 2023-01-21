@@ -47,4 +47,25 @@ describe('a Comment entities', () => {
     expect(username).toEqual(payload.username);
     expect(replies).toEqual(payload.replies);
   });
+  it('should create a comment object correctly but not have replies', () => {
+    // Arrange
+    const payload = {
+      id: 'comment-123',
+      content: 'test comment',
+      date: new Date('2023-01-09'),
+      username: 'user-123',
+    };
+
+    // Action
+    const {
+      id, content, date, username, replies,
+    } = new Comment(payload);
+
+    // Assert
+    expect(id).toEqual(payload.id);
+    expect(content).toEqual(payload.content);
+    expect(date).toEqual(payload.date);
+    expect(username).toEqual(payload.username);
+    expect(replies).not.toBeDefined();
+  });
 });

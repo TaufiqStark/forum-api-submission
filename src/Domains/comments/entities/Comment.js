@@ -10,7 +10,9 @@ class Comment {
     this.username = username;
     this.date = date;
     this.content = content;
-    this.replies = replies;
+    if (replies) {
+      this.replies = replies;
+    }
   }
 
   _verifyPayload({
