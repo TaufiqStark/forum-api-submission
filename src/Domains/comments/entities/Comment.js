@@ -3,7 +3,7 @@ class Comment {
     this._verifyPayload(payload);
 
     const {
-      id, content, date, username, replies,
+      id, content, date, username, replies, isDelete, commentId,
     } = payload;
 
     this.id = id;
@@ -12,6 +12,9 @@ class Comment {
     this.content = content;
     if (replies) {
       this.replies = replies;
+    }
+    if (isDelete) {
+      this.content = commentId ? '**balasan telah dihapus**' : '**komentar telah dihapus**';
     }
   }
 

@@ -46,6 +46,8 @@ describe('DeleteCommentUseCase', () => {
     // Assert
     expect(mockCommentRepository.verifyAvailabilityComment)
       .toHaveBeenCalledWith(commentId);
+    expect(mockCommentRepository.verifyCommentOwner)
+      .toBeCalledWith(commentId, 'user-123');
     expect(mockCommentRepository.deleteComment)
       .toHaveBeenCalledWith(commentId);
   });

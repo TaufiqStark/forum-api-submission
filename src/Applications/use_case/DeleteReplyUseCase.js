@@ -7,7 +7,7 @@ class DeleteReplyUseCase {
     this._validatePayload(id);
     await this._commentRepository.verifyAvailabilityComment(id);
     await this._commentRepository.verifyCommentOwner(id, owner);
-    return this._commentRepository.deleteComment(id, '**balasan telah dihapus**');
+    return this._commentRepository.deleteComment(id);
   }
 
   _validatePayload(id) {

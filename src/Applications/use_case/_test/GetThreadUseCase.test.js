@@ -45,7 +45,14 @@ describe('GetThreadUseCase', () => {
 
     /** mocking needed function */
     mockThreadRepository.getThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(expectedThread));
+      .mockImplementation(() => Promise.resolve(new Thread({
+        id: 'thread-123',
+        title: 'test',
+        body: 'test thread',
+        date: new Date('2023-01-09'),
+        username: 'user-123',
+        comments: [],
+      })));
 
     /** creating use case instance */
     const getThreadUseCase = new GetThreadUseCase({
