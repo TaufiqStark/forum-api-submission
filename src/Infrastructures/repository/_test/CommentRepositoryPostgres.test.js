@@ -141,6 +141,30 @@ describe('CommentRepositoryPostgres', () => {
     });
   });
 
+  describe('getCommentsByThreadId', () => {
+    it('should return 1 comment', async () => {
+      // Arrange
+      const commentRepository = new CommentRepositoryPostgres(pool);
+      const commentPayload = {
+        id: 'comment-123',
+        content: 'comment',
+        threadId: 'thread-123',
+        owner: 'user-123',
+      };
+      await UsersTableTestHelper.addUser({ id: commentPayload.owner });
+      await ThreadsTableTestHelper.addThread({
+        id: commentPayload.threadId, owner: commentPayload.owner,
+      });
+      await CommentsTableTestHelper.addComment(commentPayload);
+
+      // Action
+      const comments = await commentRepository.getCommentsByThreadId(commentPayload.threadId);
+
+      // Assert
+      expect(comments).toHaveLength(1);
+    });
+  });
+
   describe('deleteComment', () => {
     it('should set isDelete to true', async () => {
       // Arrange

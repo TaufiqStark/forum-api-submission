@@ -21,7 +21,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
     const result = await this._pool.query(query);
 
-    return new AddedThread({ ...result.rows[0] });
+    return new AddedThread(result.rows[0]);
   }
 
   async verifyAvailabilityThread(id) {
@@ -50,30 +50,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
       throw new NotFoundError('thread tidak ditemukan');
     }
 
-    const commentQuery = {
-      text: `SELECT c.*, u.username FROM comments c
-      LEFT JOIN users u ON u.id = c.owner WHERE c."threadId" = $1 AND c."commentId" IS NULL ORDER BY date`,
-      values: [result.rows[0]?.id],
-    };
-    const comments = await this._pool.query(commentQuery);
-
-    const replyQuery = {
-      text: `SELECT c.*, u.username FROM comments c
-      LEFT JOIN users u ON u.id = c.owner WHERE c."threadId" = $1 AND c."commentId" = ANY($2::text[]) ORDER BY date`,
-      values: [result.rows[0]?.id, comments.rows.map((c) => c.id)],
-    };
-    const replies = await this._pool.query(replyQuery);
-
-    return new Thread({
-      ...result.rows[0],
-      comments: comments.rows
-        .map((c) => new Comment({
-          ...c,
-          replies: replies.rows
-            .map((r) => (c.id === r.commentId ? new Comment(r) : 0))
-            .filter((r) => r),
-        })),
-    });
+    return new Thread(result.rows[0]);
   }
 }
 

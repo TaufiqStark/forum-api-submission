@@ -10,9 +10,7 @@ class Comment {
     this.username = username;
     this.date = date;
     this.content = content;
-    if (replies) {
-      this.replies = replies;
-    }
+    this.replies = replies;
     if (isDelete) {
       this.content = commentId ? '**balasan telah dihapus**' : '**komentar telah dihapus**';
     }

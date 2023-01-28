@@ -9,9 +9,7 @@ class NewComment {
     this.threadId = threadId;
     this.content = content;
     this.owner = owner;
-    if (commentId) {
-      this.commentId = commentId;
-    }
+    this.commentId = commentId;
   }
 
   _verifyPayload({

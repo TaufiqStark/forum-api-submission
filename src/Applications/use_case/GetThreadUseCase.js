@@ -1,11 +1,24 @@
+const Comment = require('../../Domains/comments/entities/Comment');
+const Thread = require('../../Domains/threads/entities/Thread');
+
 class GetThreadUseCase {
-  constructor({ threadRepository }) {
+  constructor({ threadRepository, commentRepository }) {
     this._threadRepository = threadRepository;
+    this._commentRepository = commentRepository;
   }
 
   async execute(id) {
     this._validatePayload(id);
-    return this._threadRepository.getThreadById(id);
+    const thread = await this._threadRepository.getThreadById(id);
+    const comments = await this._commentRepository.getCommentsByThreadId(id);
+
+    thread.comments = comments.filter((comment) => !comment.commentId)
+      .map((comment) => {
+        const replies = comments.filter((reply) => reply.commentId === comment.id)
+          .map((reply) => new Comment(reply));
+        return new Comment({ ...comment, replies });
+      });
+    return new Thread(thread);
   }
 
   _validatePayload(id) {
