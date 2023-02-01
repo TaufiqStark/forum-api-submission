@@ -32,12 +32,13 @@ describe('a Comment entities', () => {
       content: 'test comment',
       date: new Date('2023-01-09'),
       username: 'user-123',
+      likeCount: 1,
       replies: [],
     };
 
     // Action
     const {
-      id, content, date, username, replies,
+      id, content, date, username, likeCount, replies,
     } = new Comment(payload);
 
     // Assert
@@ -45,6 +46,7 @@ describe('a Comment entities', () => {
     expect(content).toEqual(payload.content);
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
+    expect(likeCount).toEqual(payload.likeCount);
     expect(replies).toEqual(payload.replies);
   });
 
