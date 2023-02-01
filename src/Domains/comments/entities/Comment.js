@@ -3,13 +3,14 @@ class Comment {
     this._verifyPayload(payload);
 
     const {
-      id, content, date, username, replies, isDelete, commentId,
+      id, content, date, username, replies, isDelete, commentId, likeCount,
     } = payload;
 
     this.id = id;
     this.username = username;
     this.date = date;
     this.content = content;
+    this.likeCount = likeCount;
     this.replies = replies;
     if (isDelete) {
       this.content = commentId ? '**balasan telah dihapus**' : '**komentar telah dihapus**';
