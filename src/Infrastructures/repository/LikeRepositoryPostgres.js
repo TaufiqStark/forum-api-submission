@@ -37,15 +37,15 @@ class LikeRepositoryPostgres extends LikeRepository {
     return Boolean(result.rowCount);
   }
 
-  async getCommentLikesCount(commentId) {
+  async getCommentsLikesCount(commentIds) {
     const query = {
-      text: 'SELECT COUNT(*)::int FROM likes WHERE "commentId" = $1',
-      values: [commentId],
+      text: 'SELECT "commentId", COUNT(*)::int FROM likes WHERE "commentId" = ANY($1) GROUP BY "commentId"',
+      values: [[...commentIds, '']],
     };
 
     const result = await this._pool.query(query);
 
-    return result.rows[0].count;
+    return result.rows;
   }
 }
 

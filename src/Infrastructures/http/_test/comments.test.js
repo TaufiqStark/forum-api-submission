@@ -1,5 +1,6 @@
 const AuthenticationsTableTestHelper = require('../../../../tests/AuthenticationsTableTestHelper');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
+const LikesTableTestHelper = require('../../../../tests/LikesTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
 const container = require('../../container');
@@ -51,6 +52,7 @@ describe('/threads/{threadsId}/comments endpoints', () => {
     await UsersTableTestHelper.cleanTable();
     await AuthenticationsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
+    await LikesTableTestHelper.cleanTable();
     await pool.end();
   });
 
@@ -278,6 +280,77 @@ describe('/threads/{threadsId}/comments endpoints', () => {
       const response = await server.inject({
         method: 'DELETE',
         url: `/threads/${global.thread.id}/comments/${comment?.data.addedComment?.id}/replies/xxx`,
+        headers: { Authorization: `Bearer ${global.token?.accessToken}` },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('comment tidak ditemukan');
+    });
+  });
+
+  describe('when PUT /threads/{threadId}/comments/{commentId}/likes', () => {
+    it('should response 200', async () => {
+      // Arrange
+      const requestPayload = {
+        content: 'abc',
+      };
+      const server = await createServer(container);
+      const { result: comment } = await server.inject({
+        method: 'POST',
+        url: `/threads/${global.thread.id}/comments`,
+        headers: { Authorization: `Bearer ${global.token?.accessToken}` },
+        payload: requestPayload,
+      });
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${global.thread.id}/comments/${comment?.data?.addedComment?.id}/likes`,
+        headers: { Authorization: `Bearer ${global.token?.accessToken}` },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(200);
+      expect(responseJson.status).toEqual('success');
+    });
+
+    it('should response 404 when thread not found', async () => {
+      // Arrange
+      const server = await createServer(container);
+
+      const { result: comment } = await server.inject({
+        method: 'POST',
+        url: `/threads/${global.thread.id}/comments`,
+        headers: { Authorization: `Bearer ${global.token?.accessToken}` },
+        payload: { content: 'abc' },
+      });
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/xxx/comments/${comment?.data.addedComment?.id}/likes`,
+        headers: { Authorization: `Bearer ${global.token?.accessToken}` },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('thread tidak ditemukan');
+    });
+
+    it('should response 404 when comment not found', async () => {
+      // Arrange
+      const server = await createServer(container);
+
+      // Action
+      const response = await server.inject({
+        method: 'PUT',
+        url: `/threads/${global.thread.id}/comments/xxx/likes`,
         headers: { Authorization: `Bearer ${global.token?.accessToken}` },
       });
 

@@ -84,8 +84,8 @@ describe('LikeRepositoryPostgres', () => {
     });
   });
 
-  describe('getCommentLikesCount', () => {
-    it('should persist getCommentLikesCount correctly', async () => {
+  describe('getCommentsLikesCount', () => {
+    it('should persist getCommentsLikesCount correctly', async () => {
       // Arrange
       await UsersTableTestHelper.addUser({ id: 'user-123' });
       await ThreadsTableTestHelper.addThread({ id: 'thread-123', owner: 'user-123' });
@@ -94,10 +94,26 @@ describe('LikeRepositoryPostgres', () => {
       const likeRepositoryPostgres = new LikeRepositoryPostgres(pool, {});
 
       // Action
-      const like = await likeRepositoryPostgres.getCommentLikesCount('comment-123');
+      const like = await likeRepositoryPostgres.getCommentsLikesCount(['comment-123']);
 
       // Assert
-      expect(like).toEqual(1);
+      expect(like).toHaveLength(1);
+      expect(like[0].count).toEqual(1);
+    });
+
+    it('should persist getCommentsLikesCount correctly', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadsTableTestHelper.addThread({ id: 'thread-123', owner: 'user-123' });
+      await CommentsTableTestHelper.addComment({ id: 'comment-123', owner: 'user-123', threadId: 'thread-123' });
+      await LikesTableTestHelper.addLike('user-123', 'comment-123');
+      const likeRepositoryPostgres = new LikeRepositoryPostgres(pool, {});
+
+      // Action
+      const like = await likeRepositoryPostgres.getCommentsLikesCount([]);
+
+      // Assert
+      expect(like).toHaveLength(0);
     });
   });
 });
