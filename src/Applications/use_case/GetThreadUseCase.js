@@ -20,7 +20,7 @@ class GetThreadUseCase {
       .map((comment) => {
         const replies = comments.filter((reply) => reply.commentId === comment.id)
           .map((reply) => new Comment(reply));
-        const [likeCount] = likeCounts.filter((like) => like.commentId === comment.id);
+        const likeCount = likeCounts.find((like) => like.commentId === comment.id);
         return new Comment({ ...comment, likeCount: likeCount?.count, replies });
       });
     return new Thread(thread);
